@@ -11,7 +11,9 @@
         public decimal Price { get; set; }
         public decimal UnitDiscountAmount { get; set; }
         public int CategoryId { get; set; }
-        public int MaxQuantity { get; set; }
+        public int? MaxQuantity { get; set; }
         public bool IsActive { get; set; }
+        public Author Author { get; set; } = null!;
+        public Category Category { get; set; } = null!;
     }
 }
