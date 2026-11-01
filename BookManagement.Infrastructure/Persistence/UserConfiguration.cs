@@ -27,6 +27,10 @@ namespace BookManagement.Infrastructure.Persistence
                 .IsRequired()
                 .HasDefaultValue(true);
 
+            builder.Property(u => u.MustChangePassword)
+                .IsRequired()
+                .HasDefaultValue(false);
+
             // Unique property
             builder.HasIndex(u => u.Email)
                 .IsUnique()
