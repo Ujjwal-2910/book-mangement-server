@@ -8,6 +8,9 @@ namespace BookManagement.Infrastructure.Persistence
     {
         public void Configure(EntityTypeBuilder<Book> builder)
         {
+            // Primary Key
+            builder.HasKey(b => b.Id);
+
             // Decimal Precision
             builder.Property(b => b.Price)
                 .HasPrecision(18, 2)
@@ -17,6 +20,10 @@ namespace BookManagement.Infrastructure.Persistence
                 .HasPrecision(18, 2)
                 .IsRequired()
                 .HasDefaultValue(0);
+
+            builder.Property(b => b.IsActive)
+                .IsRequired()
+                .HasDefaultValue(true);
 
             // Required Properties
             builder.Property(b => b.Title)
@@ -29,24 +36,22 @@ namespace BookManagement.Infrastructure.Persistence
                 .IsRequired()
                 .HasDefaultValue(0);
 
-            builder.Property(b => b.IsActive)
-                .IsRequired()
-                .HasDefaultValue(true);
-
             // Many to one Relations
             builder.HasOne(b => b.Author)
                 .WithMany(a => a.Books)
                 .HasForeignKey(b => b.AuthorId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasOne(b => b.Category)
                 .WithMany(c => c.Books)
                 .HasForeignKey(b => b.CategoryId)
+                .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Unique property
-            builder.HasIndex(b => b.ISBN)
-                .IsUnique();
+            builder.HasAlternateKey(b => b.ISBN)
+                .HasName("UQ_Books_ISBN");
 
             // Foreign Key Constraints
             builder.ToTable(table =>

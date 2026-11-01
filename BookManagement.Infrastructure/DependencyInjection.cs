@@ -1,6 +1,4 @@
-﻿using BookManagement.Infrastructure.Identity;
-using BookManagement.Infrastructure.Persistence;
-using Microsoft.AspNetCore.Identity;
+﻿using BookManagement.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,11 +17,6 @@ namespace BookManagement.Infrastructure
                     "Connection string 'DefaultConnection' not found.");
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
-
-            services
-                .AddIdentityCore<ApplicationUser>()
-                .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
 
             return services;
         }

@@ -8,13 +8,17 @@ namespace BookManagement.Infrastructure.Persistence
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
+            // Primary Key
+            builder.HasKey(c => c.Id);
+
             // required property
             builder.Property(c => c.Name)
                 .IsRequired();
 
             // Unique property
             builder.HasIndex(c => c.Name)
-                .IsUnique();
+                .IsUnique()
+                .HasDatabaseName("UX_Categories_Name");
         }
     }
 }
