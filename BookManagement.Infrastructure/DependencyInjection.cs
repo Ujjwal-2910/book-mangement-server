@@ -1,9 +1,11 @@
-﻿using BookManagement.Application.Interfaces.Repositories;
+﻿using BookManagement.Application.Configuration;
+using BookManagement.Application.Interfaces.Repositories;
 using BookManagement.Application.Interfaces.Security;
 using BookManagement.Domain.Entities;
 using BookManagement.Infrastructure.Identity;
 using BookManagement.Infrastructure.Persistence;
 using BookManagement.Infrastructure.Repositories;
+using BookManagement.Infrastructure.Security;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,7 +33,32 @@ namespace BookManagement.Infrastructure
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IRoleRepository, RoleRepository>();
 
+            services.AddOptions<JwtSettings>()
+                .Bind(configuration.GetSection("Jwt"))
+                .Validate(settings =>
+                    !string.IsNullOrWhiteSpace(settings.Issuer) &&
+                    !string.IsNullOrWhiteSpace(settings.Audience) &&
+                    !string.IsNullOrWhiteSpace(settings.SecretKey) &&
+                    IsValidSecretKey(settings.SecretKey) &&
+                    settings.ExpirationInMinutes > 0,
+                    "JWT configuration is invalid.")
+                .ValidateOnStart();
+
+            services.AddScoped<ITokenService, JwtTokenService>();
+
             return services;
+        }
+
+        private static bool IsValidSecretKey(string secretKey)
+        {
+            try
+            {
+                return Convert.FromBase64String(secretKey).Length >= 32;
+            }
+            catch (FormatException)
+            {
+                return false;
+            }
         }
     }
 }

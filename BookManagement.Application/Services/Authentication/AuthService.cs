@@ -15,18 +15,21 @@ namespace BookManagement.Application.Services.Authentication
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasherService _passwordHasher;
         private readonly IMapper _mapper;
+        private readonly ITokenService _tokenService;
 
         public AuthService(IUserRepository userRepository,
             IRoleRepository roleRepository,
             IUnitOfWork unitOfWork,
             IPasswordHasherService passwordHasher,
-            IMapper mapper)
+            IMapper mapper,
+            ITokenService tokenService)
         {
             _userRepository = userRepository;
             _roleRepository = roleRepository;
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
             _mapper = mapper;
+            _tokenService = tokenService;
         }
 
         public async Task<RegisterUserResponse> RegisterCustomerAsync(RegisterUserRequest request)
@@ -59,6 +62,28 @@ namespace BookManagement.Application.Services.Authentication
             await _userRepository.AddAsync(newUser);
             await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<RegisterUserResponse>(newUser);
+        }
+
+        public async Task<LoginResponse> LoginAsync(LoginRequest request)
+        {
+            var normalizedEmail = request.Email.Trim().ToUpperInvariant();
+
+            var user = await _userRepository.GetByEmailAsync(normalizedEmail);
+
+            if (user is null || !user.IsActive || !_passwordHasher.VerifyPassword(
+                user, user.PasswordHash, request.Password))
+            {
+                throw new InvalidCredentialsException();
+            }
+
+            var tokenResult = _tokenService.GenerateAccessToken(user);
+
+            var response = _mapper.Map<LoginResponse>(user);
+
+            response.AccessToken = tokenResult.AccessToken;
+            response.ExpiresAt = tokenResult.ExpiresAt;
+
+            return response;
         }
     }
 }

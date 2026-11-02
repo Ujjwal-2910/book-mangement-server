@@ -38,6 +38,23 @@ namespace BookManagement.API.Middleware
                     message = ex.Message
                 });
             }
+            catch (InvalidCredentialsException ex)
+            {
+                if (context.Response.HasStarted)
+                {
+                    throw;
+                }
+
+                _logger.LogWarning(ex, "Authentication failed.");
+
+                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                context.Response.ContentType = "application/json";
+
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    message = ex.Message
+                });
+            }
             catch (Exception ex)
             {
                 if (context.Response.HasStarted)

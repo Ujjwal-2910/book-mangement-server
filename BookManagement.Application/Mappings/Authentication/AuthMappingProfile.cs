@@ -13,6 +13,12 @@ namespace BookManagement.Application.Mappings.Authentication
                     destination => destination.Role,
                     options => options.MapFrom(source => source.Role.Name)
                 );
+
+            CreateMap<User, LoginResponse>()
+                .ForMember(
+                    destination => destination.Role,
+                    options => options.MapFrom(source => source.Role.Name)
+                );
         }
     }
 }
