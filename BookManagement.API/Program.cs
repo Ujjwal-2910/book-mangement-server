@@ -1,3 +1,5 @@
+using BookManagement.API.Middleware;
+using BookManagement.Application;
 using BookManagement.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,8 +15,11 @@ builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -1,7 +1,9 @@
-﻿using BookManagement.Application.Interfaces.Security;
+﻿using BookManagement.Application.Interfaces.Repositories;
+using BookManagement.Application.Interfaces.Security;
 using BookManagement.Domain.Entities;
 using BookManagement.Infrastructure.Identity;
 using BookManagement.Infrastructure.Persistence;
+using BookManagement.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +26,10 @@ namespace BookManagement.Infrastructure
 
             services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IRoleRepository, RoleRepository>();
 
             return services;
         }
